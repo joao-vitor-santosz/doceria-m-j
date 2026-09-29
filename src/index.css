@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-canvas: #082747;
+  --color-brand-navy: #082747;
+  --color-brand-navy-light: #0d345b;
+  --color-brand-gold: #d7ae68;
+  --color-brand-gold-dark: #8b682f;
+  --color-brand-cream: #fff8e9;
+  --shadow-logo: 0 12px 30px rgb(0 13 30 / 38%);
+  --shadow-card: 0 12px 24px rgb(0 13 30 / 24%);
+  --shadow-card-hover: 0 18px 32px rgb(0 13 30 / 36%);
+  --background-image-page-glow: radial-gradient(circle at 50% 4%, rgb(64 112 151 / 32%), transparent 32%), radial-gradient(circle at 50% 100%, rgb(0 14 31 / 45%), transparent 55%);
+}
+
+* { box-sizing: border-box; }
+html { background: #082747; }
+body { margin: 0; min-width: 320px; }
+a { text-decoration: none; }
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-entrance {
+  animation: slide-up-fade 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-entrance {
+    animation: none;
+  }
+}
