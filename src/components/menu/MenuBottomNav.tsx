@@ -1,14 +1,14 @@
 import { BookOpen, LogIn, Search } from "lucide-react";
 import type { ReactNode } from "react";
-import type { AppPage } from "../../types/navigation";
+import { useNavigate } from "@tanstack/react-router";
 
 type MenuBottomNavProps = {
-  activePage: AppPage;
-  onNavigate: (page: AppPage) => void;
+  activePage: "menu" | "information" | "sign-in";
   onSearch?: () => void;
 };
 
-export function MenuBottomNav({ activePage, onNavigate, onSearch }: MenuBottomNavProps) {
+export function MenuBottomNav({ activePage, onSearch }: MenuBottomNavProps) {
+  const navigate = useNavigate();
   const isMenuActive = activePage === "menu";
 
   return (
@@ -21,14 +21,14 @@ export function MenuBottomNav({ activePage, onNavigate, onSearch }: MenuBottomNa
           active={isMenuActive}
           icon={<BookOpen size={19} aria-hidden="true" />}
           label="Cardápio"
-          onClick={() => onNavigate("menu")}
+          onClick={() => navigate({ to: "/menu" })}
         />
         <NavButton
           active={false}
           icon={<Search size={19} aria-hidden="true" />}
           label="Busca"
           onClick={() => {
-            onNavigate("menu");
+            navigate({ to: "/menu" });
             onSearch?.();
           }}
         />
@@ -36,7 +36,7 @@ export function MenuBottomNav({ activePage, onNavigate, onSearch }: MenuBottomNa
           active={activePage === "sign-in"}
           icon={<LogIn size={19} aria-hidden="true" />}
           label="Entrar"
-          onClick={() => onNavigate("sign-in")}
+          onClick={() => navigate({ to: "/entrar" })}
         />
       </div>
     </nav>

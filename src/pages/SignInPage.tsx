@@ -1,18 +1,13 @@
 import { Mail, UserRound } from "lucide-react";
 import { useState, type FormEvent, type ReactNode } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { PageTopBar } from "../components/layout/PageTopBar";
 import { MenuBottomNav } from "../components/menu/MenuBottomNav";
 import logo from "../assets/logo-mj.jpeg";
-import type { AppPage } from "../types/navigation";
-
-type SignInPageProps = {
-  onBack: () => void;
-  onNavigate: (page: AppPage) => void;
-};
-
 type AuthMode = "sign-in" | "sign-up";
 
-export function SignInPage({ onBack, onNavigate }: SignInPageProps) {
+export function SignInPage() {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<AuthMode>("sign-in");
   const [submitted, setSubmitted] = useState(false);
   const isSignUp = mode === "sign-up";
@@ -29,7 +24,10 @@ export function SignInPage({ onBack, onNavigate }: SignInPageProps) {
 
   return (
     <main className="min-h-dvh bg-brand-cream pb-24 text-brand-navy">
-      <PageTopBar title={isSignUp ? "Criar conta" : "Entrar"} onBack={onBack} />
+      <PageTopBar
+        title={isSignUp ? "Criar conta" : "Entrar"}
+        onBack={() => navigate({ to: "/menu" })}
+      />
       <section className="mx-auto w-full max-w-md px-4 py-8 sm:px-6 sm:py-12">
         <div className="rounded-3xl border border-brand-gold/30 bg-white p-6 shadow-card sm:p-8">
           <img
@@ -117,7 +115,7 @@ export function SignInPage({ onBack, onNavigate }: SignInPageProps) {
           )}
         </div>
       </section>
-      <MenuBottomNav activePage="sign-in" onNavigate={onNavigate} />
+      <MenuBottomNav activePage="sign-in" />
     </main>
   );
 }

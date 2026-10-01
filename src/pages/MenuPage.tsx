@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import logo from "../assets/logo-mj.jpeg";
 import { CategoryFilter } from "../components/menu/CategoryFilter";
 import { MenuHeader } from "../components/menu/MenuHeader";
@@ -8,16 +9,10 @@ import { ProductSearch } from "../components/menu/ProductSearch";
 import { StoreSummaryCard } from "../components/menu/StoreSummaryCard";
 import { siteConfig } from "../config/site";
 import { storeConfig } from "../config/store";
-import { productCategories, products, type Product, type ProductCategoryId } from "../data/catalog";
-import type { AppPage } from "../types/navigation";
+import { productCategories, products, type ProductCategoryId } from "../data/catalog";
 
-type MenuPageProps = {
-  onBack: () => void;
-  onNavigate: (page: AppPage) => void;
-  onSelectProduct: (product: Product) => void;
-};
-
-export function MenuPage({ onBack, onNavigate, onSelectProduct }: MenuPageProps) {
+export function MenuPage() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<ProductCategoryId | "all">("all");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -38,7 +33,7 @@ export function MenuPage({ onBack, onNavigate, onSelectProduct }: MenuPageProps)
 
   return (
     <main className="min-h-dvh bg-brand-cream pb-24 text-brand-navy">
-      <MenuHeader onBack={onBack} />
+      <MenuHeader onBack={() => navigate({ to: "/" })} />
       <section className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="mb-8 max-w-2xl">
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand-gold-dark">
@@ -56,7 +51,7 @@ export function MenuPage({ onBack, onNavigate, onSelectProduct }: MenuPageProps)
             logoSrc={logo}
             name={siteConfig.name}
             category={storeConfig.category}
-            onClick={() => onNavigate("information")}
+            onClick={() => navigate({ to: "/informacoes" })}
           />
           <ProductSearch value={query} onChange={setQuery} inputRef={searchInputRef} />
           <CategoryFilter
@@ -68,13 +63,17 @@ export function MenuPage({ onBack, onNavigate, onSelectProduct }: MenuPageProps)
             products={filteredProducts}
             categories={productCategories}
             selectedCategory={selectedCategory}
-            onSelectProduct={onSelectProduct}
+            onSelectProduct={(product) =>
+              navigate({
+                to: "/menu/produtos/$productId",
+                params: { productId: product.id },
+              })
+            }
           />
         </div>
       </section>
       <MenuBottomNav
         activePage="menu"
-        onNavigate={onNavigate}
         onSearch={() => searchInputRef.current?.focus()}
       />
     </main>

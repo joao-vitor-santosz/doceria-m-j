@@ -1,19 +1,14 @@
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { useState } from "react";
+import { useLoaderData, useNavigate } from "@tanstack/react-router";
 import { PageTopBar } from "../components/layout/PageTopBar";
 import { MenuBottomNav } from "../components/menu/MenuBottomNav";
 import { ProductImage } from "../components/menu/ProductImage";
-import type { Product } from "../data/catalog";
-import type { AppPage } from "../types/navigation";
 import { formatPrice } from "../utils/currency";
 
-type ProductDetailPageProps = {
-  product: Product;
-  onBack: () => void;
-  onNavigate: (page: AppPage) => void;
-};
-
-export function ProductDetailPage({ product, onBack, onNavigate }: ProductDetailPageProps) {
+export function ProductDetailPage() {
+  const navigate = useNavigate();
+  const product = useLoaderData({ from: "/menu/produtos/$productId" });
   const [quantity, setQuantity] = useState(1);
   const [note, setNote] = useState("");
   const [wasAdded, setWasAdded] = useState(false);
@@ -21,7 +16,7 @@ export function ProductDetailPage({ product, onBack, onNavigate }: ProductDetail
 
   return (
     <main className="min-h-dvh bg-brand-cream pb-24 text-brand-navy">
-      <PageTopBar title="Detalhe do produto" onBack={onBack} />
+      <PageTopBar title="Detalhe do produto" onBack={() => navigate({ to: "/menu" })} />
       <section className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
         <article className="overflow-hidden rounded-3xl border border-brand-gold/30 bg-white shadow-card">
           <ProductImage
@@ -99,7 +94,7 @@ export function ProductDetailPage({ product, onBack, onNavigate }: ProductDetail
           </p>
         )}
       </section>
-      <MenuBottomNav activePage="menu" onNavigate={onNavigate} />
+      <MenuBottomNav activePage="menu" />
     </main>
   );
 }

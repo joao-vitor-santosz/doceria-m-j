@@ -1,15 +1,10 @@
 import { CreditCard, MapPin, Store, Timer } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { PageTopBar } from "../components/layout/PageTopBar";
 import { MenuBottomNav } from "../components/menu/MenuBottomNav";
 import logo from "../assets/logo-mj.jpeg";
 import { storeConfig } from "../config/store";
 import { siteConfig } from "../config/site";
-import type { AppPage } from "../types/navigation";
-
-type InformationPageProps = {
-  onBack: () => void;
-  onNavigate: (page: AppPage) => void;
-};
 
 const informationItems = [
   { icon: MapPin, title: "Endereço", content: storeConfig.address },
@@ -17,10 +12,12 @@ const informationItems = [
   { icon: CreditCard, title: "Formas de pagamento", content: storeConfig.paymentMethods },
 ] as const;
 
-export function InformationPage({ onBack, onNavigate }: InformationPageProps) {
+export function InformationPage() {
+  const navigate = useNavigate();
+
   return (
     <main className="min-h-dvh bg-brand-cream pb-24 text-brand-navy">
-      <PageTopBar title="Sobre a doceria" onBack={onBack} />
+      <PageTopBar title="Sobre a doceria" onBack={() => navigate({ to: "/menu" })} />
       <section className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="flex flex-col items-center border-b border-brand-gold/30 pb-8 text-center">
           <img
@@ -55,7 +52,7 @@ export function InformationPage({ onBack, onNavigate }: InformationPageProps) {
           </p>
         </section>
       </section>
-      <MenuBottomNav activePage="information" onNavigate={onNavigate} />
+      <MenuBottomNav activePage="information" />
     </main>
   );
 }

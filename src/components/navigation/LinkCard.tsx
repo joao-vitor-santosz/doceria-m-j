@@ -1,7 +1,8 @@
 import type { MouseEvent } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import type { SocialLink } from "../../config/site";
 
-type LinkCardProps = SocialLink & { onInternalNavigate: (href: string) => void };
+type LinkCardProps = SocialLink;
 
 export function LinkCard({
   label,
@@ -9,15 +10,15 @@ export function LinkCard({
   href,
   internal = false,
   icon: Icon,
-  onInternalNavigate,
 }: LinkCardProps) {
+  const navigate = useNavigate();
   const isPlaceholder = href === "#";
 
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     if (!internal) return;
 
     event.preventDefault();
-    onInternalNavigate(href);
+    navigate({ to: "/menu" });
   }
 
   return (
