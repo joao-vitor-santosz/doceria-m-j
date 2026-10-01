@@ -5,12 +5,25 @@ import { LinkList } from "./components/navigation/LinkList";
 import { Entrance } from "./components/ui/Entrance";
 import logo from "./assets/logo-mj.jpeg";
 import { siteConfig } from "./config/site";
+import { products, type Product } from "./data/catalog";
 import { InformationPage } from "./pages/InformationPage";
 import { MenuPage } from "./pages/MenuPage";
+import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { SignInPage } from "./pages/SignInPage";
-import type { AppPage } from "./types/navigation";
+import type { AppPage, AppRoute } from "./types/navigation";
 
-function getCurrentPage(): AppPage {
+const productPathPrefix = "/menu/produtos/";
+
+function getProductFromPath(): Product | undefined {
+  if (!window.location.pathname.startsWith(productPathPrefix)) return undefined;
+
+  const productId = decodeURIComponent(window.location.pathname.slice(productPathPrefix.length));
+  return products.find((product) => product.id === productId);
+}
+
+function getCurrentPage(): AppRoute {
+  if (getProductFromPath()) return "product";
+
   switch (window.location.pathname) {
     case "/menu":
       return "menu";
@@ -19,7 +32,7 @@ function getCurrentPage(): AppPage {
     case "/entrar":
       return "sign-in";
     default:
-      return "home";
+      return window.location.pathname.startsWith(productPathPrefix) ? "menu" : "home";
   }
 }
 
@@ -31,7 +44,7 @@ const pagePaths: Record<AppPage, string> = {
 };
 
 function App() {
-  const [page, setPage] = useState<AppPage>(getCurrentPage);
+  const [page, setPage] = useState<AppRoute>(getCurrentPage);
 
   useEffect(() => {
     function handlePopState() {
@@ -52,8 +65,32 @@ function App() {
     navigateToPath(pagePaths[page]);
   }
 
+  function navigateToProduct(product: Product) {
+    navigateToPath(`${productPathPrefix}${encodeURIComponent(product.id)}`);
+  }
+
   if (page === "menu") {
-    return <MenuPage onBack={() => navigate("home")} onNavigate={navigate} />;
+    return (
+      <MenuPage
+        onBack={() => navigate("home")}
+        onNavigate={navigate}
+        onSelectProduct={navigateToProduct}
+      />
+    );
+  }
+
+  if (page === "product") {
+    const product = getProductFromPath();
+
+    if (product) {
+      return (
+        <ProductDetailPage
+          product={product}
+          onBack={() => navigate("menu")}
+          onNavigate={navigate}
+        />
+      );
+    }
   }
 
   if (page === "information") {

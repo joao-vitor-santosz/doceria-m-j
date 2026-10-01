@@ -5,9 +5,15 @@ type ProductGridProps = {
   products: readonly Product[];
   categories: readonly ProductCategory[];
   selectedCategory: ProductCategoryId | "all";
+  onSelectProduct: (product: Product) => void;
 };
 
-export function ProductGrid({ products, categories, selectedCategory }: ProductGridProps) {
+export function ProductGrid({
+  products,
+  categories,
+  selectedCategory,
+  onSelectProduct,
+}: ProductGridProps) {
   if (products.length === 0) {
     return (
       <div className="rounded-3xl border border-dashed border-brand-gold/60 bg-white/65 px-6 py-14 text-center">
@@ -25,7 +31,14 @@ export function ProductGrid({ products, categories, selectedCategory }: ProductG
 
         if (!shouldDisplay || categoryProducts.length === 0) return null;
 
-        return <ProductSection key={category.id} category={category} products={categoryProducts} />;
+        return (
+          <ProductSection
+            key={category.id}
+            category={category}
+            products={categoryProducts}
+            onSelectProduct={onSelectProduct}
+          />
+        );
       })}
     </div>
   );

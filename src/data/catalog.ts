@@ -12,6 +12,7 @@ export type Product = {
   description: string;
   price: number;
   categoryId: ProductCategoryId;
+  imageSrc?: string;
 };
 
 export const productCategories: readonly ProductCategory[] = [
@@ -34,6 +35,7 @@ export const products: readonly Product[] = [
     description: "Brownie de chocolate com cobertura cremosa de brigadeiro.",
     price: 9,
     categoryId: "brownies",
+    imageSrc: brigadeiroImage,
   },
   {
     id: "brownie-simples",
@@ -48,6 +50,7 @@ export const products: readonly Product[] = [
     description: "Brownie de chocolate com uma generosa camada de creme de ninho.",
     price: 9,
     categoryId: "brownies",
+    imageSrc: ninhoImage,
   },
   {
     id: "brownie-casadinho",
@@ -55,6 +58,7 @@ export const products: readonly Product[] = [
     description: "A combinação perfeita de brigadeiro e ninho sobre o brownie.",
     price: 10,
     categoryId: "brownies",
+    imageSrc: casadinhoImage,
   },
   {
     id: "brigadeiro-chocolate",
@@ -78,3 +82,6 @@ export const products: readonly Product[] = [
     categoryId: "brigadeiros",
   },
 ];
+import brigadeiroImage from "../assets/brigadeiro.jpeg";
+import casadinhoImage from "../assets/casadinho.jpeg";
+import ninhoImage from "../assets/ninho.jpeg";

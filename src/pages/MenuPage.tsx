@@ -8,15 +8,16 @@ import { ProductSearch } from "../components/menu/ProductSearch";
 import { StoreSummaryCard } from "../components/menu/StoreSummaryCard";
 import { siteConfig } from "../config/site";
 import { storeConfig } from "../config/store";
-import { productCategories, products, type ProductCategoryId } from "../data/catalog";
+import { productCategories, products, type Product, type ProductCategoryId } from "../data/catalog";
 import type { AppPage } from "../types/navigation";
 
 type MenuPageProps = {
   onBack: () => void;
   onNavigate: (page: AppPage) => void;
+  onSelectProduct: (product: Product) => void;
 };
 
-export function MenuPage({ onBack, onNavigate }: MenuPageProps) {
+export function MenuPage({ onBack, onNavigate, onSelectProduct }: MenuPageProps) {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<ProductCategoryId | "all">("all");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -67,6 +68,7 @@ export function MenuPage({ onBack, onNavigate }: MenuPageProps) {
             products={filteredProducts}
             categories={productCategories}
             selectedCategory={selectedCategory}
+            onSelectProduct={onSelectProduct}
           />
         </div>
       </section>

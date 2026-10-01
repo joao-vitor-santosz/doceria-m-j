@@ -4,9 +4,10 @@ import { ProductCard } from "./ProductCard";
 type ProductSectionProps = {
   category: ProductCategory;
   products: readonly Product[];
+  onSelectProduct: (product: Product) => void;
 };
 
-export function ProductSection({ category, products }: ProductSectionProps) {
+export function ProductSection({ category, products, onSelectProduct }: ProductSectionProps) {
   return (
     <section aria-labelledby={`category-${category.id}`}>
       <div className="mb-4">
@@ -17,7 +18,7 @@ export function ProductSection({ category, products }: ProductSectionProps) {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} onSelect={onSelectProduct} />
         ))}
       </div>
     </section>
