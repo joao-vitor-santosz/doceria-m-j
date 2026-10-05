@@ -6,6 +6,24 @@ export type ProductCategory = {
   description: string;
 };
 
+export type ProductOption = {
+  id: string;
+  label: string;
+  description?: string;
+  price: number;
+};
+
+export type ProductOptionGroup = {
+  id: string;
+  title: string;
+  description?: string;
+  required?: boolean;
+  selectionMode: "single" | "multiple" | "quantity";
+  minimumQuantity?: number;
+  maximumQuantity?: number;
+  options: readonly ProductOption[];
+};
+
 export type Product = {
   id: string;
   name: string;
@@ -13,6 +31,45 @@ export type Product = {
   price: number;
   categoryId: ProductCategoryId;
   imageSrc?: string;
+  customizationGroups?: readonly ProductOptionGroup[];
+};
+
+const brownieAddOns: ProductOptionGroup = {
+  id: "brownie-add-ons",
+  title: "Personalize seu brownie",
+  description: "Adicione seus acompanhamentos favoritos.",
+  selectionMode: "multiple",
+  options: [
+    { id: "strawberry", label: "Adicionar morango", price: 3 },
+    { id: "kit-kat", label: "Adicionar Kit Kat", price: 2.5 },
+  ],
+};
+
+const brigadeiroFlavorOptions: readonly ProductOption[] = [
+  { id: "brigadeiro", label: "Brigadeiro", description: "Sabor chocolate", price: 0 },
+  { id: "ninho", label: "Ninho", price: 0 },
+  { id: "casadinho", label: "Casadinho", description: "Chocolate e ninho", price: 0 },
+  { id: "beijinho", label: "Beijinho", price: 0 },
+];
+
+const brigadeiroBoxFlavors: ProductOptionGroup = {
+  id: "brigadeiro-box-flavors",
+  title: "Monte sua caixinha",
+  description: "Escolha 4 brigadeiros. Você pode repetir ou misturar os sabores.",
+  selectionMode: "quantity",
+  minimumQuantity: 4,
+  maximumQuantity: 4,
+  options: brigadeiroFlavorOptions,
+};
+
+const brigadeiroPartyFlavors: ProductOptionGroup = {
+  id: "brigadeiro-party-flavors",
+  title: "Monte o seu cento",
+  description: "Divida 100 brigadeiros entre os sabores que preferir.",
+  selectionMode: "quantity",
+  minimumQuantity: 100,
+  maximumQuantity: 100,
+  options: brigadeiroFlavorOptions,
 };
 
 export const productCategories: readonly ProductCategory[] = [
@@ -36,6 +93,7 @@ export const products: readonly Product[] = [
     price: 9,
     categoryId: "brownies",
     imageSrc: brigadeiroImage,
+    customizationGroups: [brownieAddOns],
   },
   {
     id: "brownie-simples",
@@ -43,6 +101,7 @@ export const products: readonly Product[] = [
     description: "Nosso brownie tradicional, macio por dentro e cheio de chocolate.",
     price: 7,
     categoryId: "brownies",
+    customizationGroups: [brownieAddOns],
   },
   {
     id: "brownie-ninho",
@@ -51,6 +110,7 @@ export const products: readonly Product[] = [
     price: 9,
     categoryId: "brownies",
     imageSrc: ninhoImage,
+    customizationGroups: [brownieAddOns],
   },
   {
     id: "brownie-casadinho",
@@ -59,27 +119,23 @@ export const products: readonly Product[] = [
     price: 10,
     categoryId: "brownies",
     imageSrc: casadinhoImage,
+    customizationGroups: [brownieAddOns],
   },
   {
-    id: "brigadeiro-chocolate",
-    name: "Brigadeiro de Chocolate",
-    description: "Clássico, cremoso e finalizado com granulado de chocolate.",
-    price: 3.5,
+    id: "brigadeiro-caixinha",
+    name: "Caixinha com 4 Brigadeiros",
+    description: "Monte sua caixinha com até quatro sabores diferentes.",
+    price: 9,
     categoryId: "brigadeiros",
+    customizationGroups: [brigadeiroBoxFlavors],
   },
   {
-    id: "brigadeiro-ninho",
-    name: "Brigadeiro de Ninho",
-    description: "Brigadeiro de leite ninho suave e delicado.",
-    price: 3.5,
+    id: "brigadeiro-festa",
+    name: "Cento de Brigadeiros para Festa",
+    description: "100 brigadeiros para adoçar a sua comemoração, do seu jeito.",
+    price: 170,
     categoryId: "brigadeiros",
-  },
-  {
-    id: "brigadeiro-casadinho",
-    name: "Brigadeiro Casadinho",
-    description: "Dois sabores em um doce: brigadeiro e ninho.",
-    price: 4,
-    categoryId: "brigadeiros",
+    customizationGroups: [brigadeiroPartyFlavors],
   },
 ];
 import brigadeiroImage from "../assets/brigadeiro.jpeg";

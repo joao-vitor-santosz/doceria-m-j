@@ -1,4 +1,4 @@
-import { CreditCard, MapPin, Store, Timer } from "lucide-react";
+import { CreditCard, Store, Timer } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { PageTopBar } from "../components/layout/PageTopBar";
 import { MenuBottomNav } from "../components/menu/MenuBottomNav";
@@ -7,7 +7,6 @@ import { storeConfig } from "../config/store";
 import { siteConfig } from "../config/site";
 
 const informationItems = [
-  { icon: MapPin, title: "Endereço", content: storeConfig.address },
   { icon: Timer, title: "Horário de funcionamento", content: storeConfig.openingHours },
   { icon: CreditCard, title: "Formas de pagamento", content: storeConfig.paymentMethods },
 ] as const;
