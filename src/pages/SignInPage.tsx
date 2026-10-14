@@ -1,9 +1,10 @@
 import { Mail, UserRound } from "lucide-react";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { PageTopBar } from "../components/layout/PageTopBar";
 import { MenuBottomNav } from "../components/menu/MenuBottomNav";
 import logo from "../assets/logo-mj.jpeg";
+import { siteConfig } from "../config/site";
 type AuthMode = "sign-in" | "sign-up";
 
 export function SignInPage() {
@@ -11,6 +12,10 @@ export function SignInPage() {
   const [mode, setMode] = useState<AuthMode>("sign-in");
   const [submitted, setSubmitted] = useState(false);
   const isSignUp = mode === "sign-up";
+
+  useEffect(() => {
+    document.title = `${isSignUp ? "Criar conta" : "Entrar"} | ${siteConfig.name}`;
+  }, [isSignUp]);
 
   function changeMode(nextMode: AuthMode) {
     setMode(nextMode);

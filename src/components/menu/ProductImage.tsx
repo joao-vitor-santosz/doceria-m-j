@@ -4,11 +4,12 @@ type ProductImageProps = {
   src?: string;
   alt: string;
   className: string;
+  loading?: "lazy" | "eager";
 };
 
-export function ProductImage({ src, alt, className }: ProductImageProps) {
+export function ProductImage({ src, alt, className, loading = "lazy" }: ProductImageProps) {
   if (src) {
-    return <img className={`object-cover ${className}`} src={src} alt={alt} />;
+    return <img className={`object-cover ${className}`} src={src} alt={alt} loading={loading} decoding="async" />;
   }
 
   return (

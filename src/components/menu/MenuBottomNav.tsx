@@ -28,8 +28,12 @@ export function MenuBottomNav({ activePage, onSearch }: MenuBottomNavProps) {
           icon={<Search size={19} aria-hidden="true" />}
           label="Busca"
           onClick={() => {
-            navigate({ to: "/menu" });
-            onSearch?.();
+            if (onSearch) {
+              onSearch();
+              return;
+            }
+
+            navigate({ to: "/menu", hash: "busca" });
           }}
         />
         <NavButton

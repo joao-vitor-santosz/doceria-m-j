@@ -1,7 +1,7 @@
 import { Minus, Plus } from "lucide-react";
 import type { ProductOption, ProductOptionGroup } from "../../data/catalog";
 import { formatPrice } from "../../utils/currency";
-import { getOptionSelectionKey } from "../../utils/product-customization";
+import { getGroupSelectedQuantity, getOptionSelectionKey } from "../../utils/product-customization";
 
 type ProductCustomizationsProps = {
   groups: readonly ProductOptionGroup[];
@@ -30,9 +30,7 @@ export function ProductCustomizations({
             <p className="mt-1 text-sm text-brand-navy/65">{group.description}</p>
           )}
           {group.selectionMode === "quantity" && (
-            <p className="mt-2 text-sm font-bold text-brand-gold-dark">
-              {getGroupQuantity(group, selectedOptionQuantities)}/{group.maximumQuantity} selecionados
-            </p>
+            <QuantityProgress group={group} selectedQuantity={getGroupSelectedQuantity(group, selectedOptionQuantities)} />
           )}
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {group.options.map((option) => {
@@ -41,8 +39,9 @@ export function ProductCustomizations({
               const isSelected = optionQuantity > 0;
 
               if (group.selectionMode === "quantity") {
-                const groupQuantity = getGroupQuantity(group, selectedOptionQuantities);
+                const groupQuantity = getGroupSelectedQuantity(group, selectedOptionQuantities);
                 const maximumForOption = (group.maximumQuantity ?? Number.MAX_SAFE_INTEGER) - groupQuantity + optionQuantity;
+                const step = group.quantityStep ?? 1;
 
                 return (
                   <div
@@ -57,30 +56,38 @@ export function ProductCustomizations({
                         </span>
                       )}
                     </span>
-                    <div className="flex items-center gap-2" aria-label={`Quantidade de ${option.label}`}>
+                    <div className="flex items-center gap-2" role="group" aria-label={`Quantidade de ${option.label}`}>
                       <button
-                        className="grid size-8 place-items-center rounded-lg border border-brand-gold/35 text-brand-navy disabled:cursor-not-allowed disabled:opacity-35"
+                        className="grid size-11 place-items-center rounded-xl border border-brand-gold/35 text-brand-navy transition hover:bg-brand-cream disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
                         type="button"
                         disabled={optionQuantity === 0}
-                        onClick={() => onQuantityChange(group, option, optionQuantity - 1)}
-                        aria-label={`Diminuir ${option.label}`}
+                        onClick={() => onQuantityChange(group, option, Math.max(0, optionQuantity - step))}
+                        aria-label={step > 1 ? `Diminuir ${step} de ${option.label}` : `Diminuir ${option.label}`}
                       >
-                        <Minus size={15} aria-hidden="true" />
+                        <Minus size={17} aria-hidden="true" />
                       </button>
-                      <output
-                        className="grid h-8 w-10 place-items-center rounded-lg border border-brand-gold/35 text-center text-sm font-extrabold"
-                        aria-live="polite"
-                      >
-                        {optionQuantity}
-                      </output>
+                      <input
+                        className="h-11 w-14 rounded-xl border border-brand-gold/35 bg-white text-center text-sm font-extrabold text-brand-navy outline-none [appearance:textfield] focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        max={maximumForOption}
+                        value={optionQuantity}
+                        onFocus={(event) => event.target.select()}
+                        onChange={(event) => {
+                          const typedQuantity = event.target.valueAsNumber;
+                          onQuantityChange(group, option, Number.isNaN(typedQuantity) ? 0 : typedQuantity);
+                        }}
+                        aria-label={`Quantidade de ${option.label}`}
+                      />
                       <button
-                        className="grid size-8 place-items-center rounded-lg bg-brand-navy text-brand-gold disabled:cursor-not-allowed disabled:opacity-35"
+                        className="grid size-11 place-items-center rounded-xl bg-brand-navy text-brand-gold transition hover:bg-brand-navy-light disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
                         type="button"
-                        disabled={optionQuantity === maximumForOption}
-                        onClick={() => onQuantityChange(group, option, optionQuantity + 1)}
-                        aria-label={`Aumentar ${option.label}`}
+                        disabled={optionQuantity >= maximumForOption}
+                        onClick={() => onQuantityChange(group, option, optionQuantity + step)}
+                        aria-label={step > 1 ? `Aumentar ${step} de ${option.label}` : `Aumentar ${option.label}`}
                       >
-                        <Plus size={15} aria-hidden="true" />
+                        <Plus size={17} aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -113,9 +120,11 @@ export function ProductCustomizations({
                       </span>
                     )}
                   </span>
-                  <span className="text-xs font-extrabold text-brand-gold-dark">
-                    {option.price > 0 ? `+ ${formatPrice(option.price)}` : "Incluso"}
-                  </span>
+                  {option.price > 0 && (
+                    <span className="text-xs font-extrabold text-brand-gold-dark">
+                      + {formatPrice(option.price)}
+                    </span>
+                  )}
                 </label>
               );
             })}
@@ -126,12 +135,17 @@ export function ProductCustomizations({
   );
 }
 
-function getGroupQuantity(
-  group: ProductOptionGroup,
-  selectedOptionQuantities: Readonly<Record<string, number>>,
-) {
-  return group.options.reduce(
-    (total, option) => total + (selectedOptionQuantities[getOptionSelectionKey(group.id, option.id)] ?? 0),
-    0,
+type QuantityProgressProps = { group: ProductOptionGroup; selectedQuantity: number };
+
+function QuantityProgress({ group, selectedQuantity }: QuantityProgressProps) {
+  const remainingQuantity = (group.maximumQuantity ?? 0) - selectedQuantity;
+
+  return (
+    <p className="mt-2 text-sm font-bold text-brand-gold-dark" aria-live="polite">
+      {selectedQuantity}/{group.maximumQuantity} selecionados
+      {remainingQuantity > 0 && (
+        <span className="font-semibold text-brand-navy/60"> · faltam {remainingQuantity}</span>
+      )}
+    </p>
   );
 }

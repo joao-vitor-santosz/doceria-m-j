@@ -1,5 +1,5 @@
 export const storeConfig = {
   category: "Doces artesanais",
-  openingHours: "Horários de atendimento em breve",
-  paymentMethods: "Formas de pagamento em breve",
+  openingHours: "Segunda a sábado, das 15h às 17h",
+  paymentMethods: "Pix",
 } as const;

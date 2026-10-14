@@ -27,6 +27,7 @@ export function LinkCard({
       href={href}
       aria-label={description ? `${label}: ${description}` : label}
       onClick={handleClick}
+      {...(!internal && !isPlaceholder && { target: "_blank", rel: "noopener noreferrer" })}
       {...(isPlaceholder && { "aria-disabled": true })}
     >
       <span className="grid size-10 place-items-center rounded-xl border border-brand-gold/50 bg-brand-navy text-brand-gold transition duration-300 group-hover:scale-105 motion-reduce:transition-none sm:size-11">

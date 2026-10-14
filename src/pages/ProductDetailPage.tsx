@@ -1,22 +1,36 @@
 import { Minus, Plus, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLoaderData, useNavigate } from "@tanstack/react-router";
 import { PageTopBar } from "../components/layout/PageTopBar";
 import { MenuBottomNav } from "../components/menu/MenuBottomNav";
 import { ProductCustomizations } from "../components/menu/ProductCustomizations";
 import { ProductImage } from "../components/menu/ProductImage";
-import type { ProductOption, ProductOptionGroup } from "../data/catalog";
+import { siteConfig } from "../config/site";
+import { productCategories, type ProductOption, type ProductOptionGroup } from "../data/catalog";
 import { formatPrice } from "../utils/currency";
-import { getOptionSelectionKey } from "../utils/product-customization";
+import {
+  getDefaultOptionQuantities,
+  getGroupSelectedQuantity,
+  getOptionSelectionKey,
+} from "../utils/product-customization";
 
 export function ProductDetailPage() {
   const navigate = useNavigate();
   const product = useLoaderData({ from: "/menu/produtos/$productId" });
+  const customizationGroups = product.customizationGroups ?? [];
+  const category = productCategories.find((item) => item.id === product.categoryId);
   const [quantity, setQuantity] = useState(1);
   const [note, setNote] = useState("");
-  const [selectedOptionQuantities, setSelectedOptionQuantities] = useState<Record<string, number>>({});
+  const [selectedOptionQuantities, setSelectedOptionQuantities] = useState<Record<string, number>>(() =>
+    getDefaultOptionQuantities(customizationGroups),
+  );
   const [wasAdded, setWasAdded] = useState(false);
-  const customizationGroups = product.customizationGroups ?? [];
+  const [showValidation, setShowValidation] = useState(false);
+
+  useEffect(() => {
+    document.title = `${product.name} | ${siteConfig.name}`;
+  }, [product.name]);
+
   const selectedOptions = customizationGroups.flatMap((group) =>
     group.options
       .filter((option) => (selectedOptionQuantities[getOptionSelectionKey(group.id, option.id)] ?? 0) > 0)
@@ -27,11 +41,8 @@ export function ProductDetailPage() {
   );
   const extraPrice = selectedOptions.reduce((sum, option) => sum + option.price * option.quantity, 0);
   const total = (product.price + extraPrice) * quantity;
-  const hasInvalidCustomization = customizationGroups.some((group) => {
-    const selectedQuantity = group.options.reduce(
-      (total, option) => total + (selectedOptionQuantities[getOptionSelectionKey(group.id, option.id)] ?? 0),
-      0,
-    );
+  const invalidGroup = customizationGroups.find((group) => {
+    const selectedQuantity = getGroupSelectedQuantity(group, selectedOptionQuantities);
 
     if (group.selectionMode === "quantity") {
       return (
@@ -42,6 +53,16 @@ export function ProductDetailPage() {
 
     return group.required && selectedQuantity === 0;
   });
+
+  function handleAdd() {
+    if (invalidGroup) {
+      setShowValidation(true);
+      setWasAdded(false);
+      return;
+    }
+
+    setWasAdded(true);
+  }
 
   function handleCustomizationChange(group: ProductOptionGroup, option: ProductOption) {
     setWasAdded(false);
@@ -76,11 +97,7 @@ export function ProductDetailPage() {
 
     setSelectedOptionQuantities((currentQuantities) => {
       const currentOptionQuantity = currentQuantities[selectionKey] ?? 0;
-      const quantityInOtherOptions = group.options.reduce((total, groupOption) => {
-        if (groupOption.id === option.id) return total;
-
-        return total + (currentQuantities[getOptionSelectionKey(group.id, groupOption.id)] ?? 0);
-      }, 0);
+      const quantityInOtherOptions = getGroupSelectedQuantity(group, currentQuantities) - currentOptionQuantity;
       const maximumQuantity = group.maximumQuantity ?? Number.MAX_SAFE_INTEGER;
       const sanitizedQuantity = Number.isFinite(requestedQuantity)
         ? Math.max(0, Math.floor(requestedQuantity))
@@ -100,11 +117,14 @@ export function ProductDetailPage() {
             className="h-[clamp(18rem,55vw,30rem)] w-full"
             src={product.imageSrc}
             alt={product.name}
+            loading="eager"
           />
           <div className="p-5 sm:p-7">
-            <span className="rounded-full bg-brand-cream px-3 py-1 text-xs font-extrabold text-brand-gold-dark">
-              Feito com amor
-            </span>
+            {category && (
+              <span className="rounded-full bg-brand-cream px-3 py-1 text-xs font-extrabold text-brand-gold-dark">
+                {category.name}
+              </span>
+            )}
             <h2 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">{product.name}</h2>
             <p className="mt-3 text-sm font-medium leading-relaxed text-brand-navy/70 sm:text-base">
               {product.description}
@@ -114,6 +134,13 @@ export function ProductDetailPage() {
             </p>
           </div>
         </article>
+
+        <ProductCustomizations
+          groups={customizationGroups}
+          selectedOptionQuantities={selectedOptionQuantities}
+          onChange={handleCustomizationChange}
+          onQuantityChange={handleQuantityChange}
+        />
 
         <section className="mt-8" aria-labelledby="notes-title">
           <div className="mb-3 flex items-end justify-between gap-4">
@@ -134,13 +161,6 @@ export function ProductDetailPage() {
             Para alterações que possam gerar cobrança adicional, entre em contato conosco.
           </p>
         </section>
-
-        <ProductCustomizations
-          groups={customizationGroups}
-          selectedOptionQuantities={selectedOptionQuantities}
-          onChange={handleCustomizationChange}
-          onQuantityChange={handleQuantityChange}
-        />
 
         <section className="mt-8 flex flex-col gap-4 rounded-3xl border border-brand-gold/30 bg-white p-4 shadow-card sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <div className="flex items-center gap-4" aria-label="Quantidade">
@@ -164,23 +184,24 @@ export function ProductDetailPage() {
             </button>
           </div>
           <button
-            className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-gold px-5 text-sm font-extrabold text-brand-navy transition hover:bg-[#e8c17c] disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+            className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-gold px-5 text-sm font-extrabold text-brand-navy transition hover:bg-[#e8c17c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
             type="button"
-            disabled={hasInvalidCustomization}
-            onClick={() => setWasAdded(true)}
+            onClick={handleAdd}
           >
             <ShoppingBag size={18} aria-hidden="true" />
             Adicionar · {formatPrice(total)}
           </button>
         </section>
-        {hasInvalidCustomization && (
-          <p className="mt-3 text-center text-sm font-semibold text-brand-gold-dark">
-            Conclua as opções obrigatórias para adicionar este produto.
+        {showValidation && invalidGroup && (
+          <p className="mt-3 text-center text-sm font-semibold text-brand-gold-dark" role="alert">
+            {invalidGroup.selectionMode === "quantity"
+              ? `Escolha ${invalidGroup.maximumQuantity} unidades em "${invalidGroup.title}" para continuar.`
+              : `Escolha uma opção em "${invalidGroup.title}" para continuar.`}
           </p>
         )}
         {wasAdded && (
           <p className="mt-4 rounded-2xl bg-brand-navy px-4 py-3 text-center text-sm font-semibold text-brand-cream" role="status">
-            Produto adicionado. O carrinho será conectado quando o backend estiver disponível.
+            O carrinho ainda não está disponível. Em breve você poderá finalizar seu pedido por aqui.
           </p>
         )}
       </section>

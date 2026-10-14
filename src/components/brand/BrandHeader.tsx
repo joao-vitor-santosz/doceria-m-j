@@ -15,7 +15,7 @@ export function BrandHeader({ name, tagline, logoSrc }: BrandHeaderProps) {
         </div>
       </Entrance>
       <Entrance delay={140}>
-        <p className="mb-1 text-center text-[clamp(0.6rem,2vw,0.7rem)] font-bold uppercase tracking-[0.3em] text-brand-gold-dark">
+        <p className="mb-1 text-center text-[clamp(0.6rem,2vw,0.7rem)] font-bold uppercase tracking-[0.3em] text-brand-gold">
           {tagline}
         </p>
       </Entrance>

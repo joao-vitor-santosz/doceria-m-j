@@ -1,4 +1,4 @@
-import { ChevronRight, MapPin } from "lucide-react";
+import { ChevronRight, Store } from "lucide-react";
 
 type StoreSummaryCardProps = {
   logoSrc: string;
@@ -23,7 +23,7 @@ export function StoreSummaryCard({ logoSrc, name, category, onClick }: StoreSumm
       <span className="min-w-0 flex-1">
         <span className="block truncate text-base font-extrabold text-brand-navy sm:text-lg">{name}</span>
         <span className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-brand-navy/65">
-          <MapPin size={15} aria-hidden="true" />
+          <Store size={15} aria-hidden="true" />
           {category}
         </span>
         <span className="mt-2 block text-xs font-bold text-brand-gold-dark">Ver informações da doceria</span>

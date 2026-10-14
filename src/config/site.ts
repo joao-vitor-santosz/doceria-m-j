@@ -12,18 +12,23 @@ export type SocialLink = {
   icon: LucideIcon | IconType;
 };
 
+const whatsappNumber = "5569992504096";
+const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+
 export const siteConfig = {
   name: "Doceria M&J",
   tagline: "Feito com amor",
   footerMessage: "Um pedacinho de carinho em cada doce",
+  whatsappNumber,
+  whatsappUrl,
   links: [
     {
       id: "whatsapp",
       label: "WhatsApp",
       description: "Entre em contato com a gente!",
-      href: "#",
+      href: whatsappUrl,
       icon: FaWhatsapp,
-    }, // Ex.: https://wa.me/5592999999999
+    },
     {
       id: "menu",
       label: "Menu",
@@ -31,6 +36,6 @@ export const siteConfig = {
       internal: true,
       icon: UtensilsCrossed,
     },
-    { id: "instagram", label: "Instagram", href: "#", icon: FaInstagram }, // Ex.: https://instagram.com/seu.perfil
+    { id: "instagram", label: "Instagram", href: "https://instagram.com/doceriam.j", icon: FaInstagram },
   ] satisfies SocialLink[],
 } as const;

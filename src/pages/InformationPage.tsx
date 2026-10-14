@@ -1,4 +1,5 @@
 import { CreditCard, Store, Timer } from "lucide-react";
+import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { PageTopBar } from "../components/layout/PageTopBar";
 import { MenuBottomNav } from "../components/menu/MenuBottomNav";
@@ -13,6 +14,10 @@ const informationItems = [
 
 export function InformationPage() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = `Sobre a doceria | ${siteConfig.name}`;
+  }, []);
 
   return (
     <main className="min-h-dvh bg-brand-cream pb-24 text-brand-navy">
@@ -47,7 +52,16 @@ export function InformationPage() {
             <h3 className="font-extrabold">Atendimento</h3>
           </div>
           <p className="mt-2 text-sm leading-relaxed text-brand-cream/80">
-            Os dados de atendimento serão atualizados em breve.
+            Fale com a gente pelo{" "}
+            <a
+              className="font-bold text-brand-gold underline underline-offset-2 hover:text-brand-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+              href={siteConfig.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp
+            </a>{" "}
+            para tirar dúvidas e fazer seu pedido.
           </p>
         </section>
       </section>

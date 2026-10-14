@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import logo from "../assets/logo-mj.jpeg";
 import { CategoryFilter } from "../components/menu/CategoryFilter";
 import { MenuHeader } from "../components/menu/MenuHeader";
@@ -16,16 +16,28 @@ export function MenuPage() {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<ProductCategoryId | "all">("all");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const hash = useLocation({ select: (location) => location.hash });
+
+  useEffect(() => {
+    document.title = `Cardápio | ${siteConfig.name}`;
+  }, []);
+
+  useEffect(() => {
+    if (hash === "busca") searchInputRef.current?.focus();
+  }, [hash]);
 
   const filteredProducts = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
+    const normalizedQuery = normalizeSearchText(query.trim());
 
     return products.filter((product) => {
       const matchesCategory =
         selectedCategory === "all" || product.categoryId === selectedCategory;
+      const optionLabels = (product.customizationGroups ?? [])
+        .flatMap((group) => group.options.map((option) => option.label))
+        .join(" ");
       const matchesQuery =
         !normalizedQuery ||
-        `${product.name} ${product.description}`.toLocaleLowerCase("pt-BR").includes(normalizedQuery);
+        normalizeSearchText(`${product.name} ${product.description} ${optionLabels}`).includes(normalizedQuery);
 
       return matchesCategory && matchesQuery;
     });
@@ -78,4 +90,8 @@ export function MenuPage() {
       />
     </main>
   );
+}
+
+function normalizeSearchText(text: string) {
+  return text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLocaleLowerCase("pt-BR");
 }

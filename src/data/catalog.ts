@@ -1,3 +1,7 @@
+import brigadeiroImage from "../assets/brigadeiro.jpeg";
+import casadinhoImage from "../assets/casadinho.jpeg";
+import ninhoImage from "../assets/ninho.jpeg";
+
 export type ProductCategoryId = "brownies" | "brigadeiros";
 
 export type ProductCategory = {
@@ -21,6 +25,8 @@ export type ProductOptionGroup = {
   selectionMode: "single" | "multiple" | "quantity";
   minimumQuantity?: number;
   maximumQuantity?: number;
+  quantityStep?: number;
+  defaultOptionId?: string;
   options: readonly ProductOption[];
 };
 
@@ -36,12 +42,15 @@ export type Product = {
 
 const brownieAddOns: ProductOptionGroup = {
   id: "brownie-add-ons",
-  title: "Personalize seu brownie",
-  description: "Adicione seus acompanhamentos favoritos.",
-  selectionMode: "multiple",
+  title: "Complemento",
+  description: "Escolha um complemento, sem alteração no valor.",
+  required: true,
+  selectionMode: "single",
+  defaultOptionId: "none",
   options: [
-    { id: "strawberry", label: "Adicionar morango", price: 3 },
-    { id: "kit-kat", label: "Adicionar Kit Kat", price: 2.5 },
+    { id: "none", label: "Sem complemento", price: 0 },
+    { id: "strawberry", label: "Morango", price: 0 },
+    { id: "kit-kat", label: "KitKat", price: 0 },
   ],
 };
 
@@ -54,7 +63,7 @@ const brigadeiroFlavorOptions: readonly ProductOption[] = [
 
 const brigadeiroBoxFlavors: ProductOptionGroup = {
   id: "brigadeiro-box-flavors",
-  title: "Monte sua caixinha",
+  title: "Monte seu quarteto",
   description: "Escolha 4 brigadeiros. Você pode repetir ou misturar os sabores.",
   selectionMode: "quantity",
   minimumQuantity: 4,
@@ -69,6 +78,7 @@ const brigadeiroPartyFlavors: ProductOptionGroup = {
   selectionMode: "quantity",
   minimumQuantity: 100,
   maximumQuantity: 100,
+  quantityStep: 10,
   options: brigadeiroFlavorOptions,
 };
 
@@ -90,7 +100,7 @@ export const products: readonly Product[] = [
     id: "brownie-brigadeiro",
     name: "Brownie de Brigadeiro",
     description: "Brownie de chocolate com cobertura cremosa de brigadeiro.",
-    price: 9,
+    price: 15,
     categoryId: "brownies",
     imageSrc: brigadeiroImage,
     customizationGroups: [brownieAddOns],
@@ -99,15 +109,14 @@ export const products: readonly Product[] = [
     id: "brownie-simples",
     name: "Brownie Simples",
     description: "Nosso brownie tradicional, macio por dentro e cheio de chocolate.",
-    price: 7,
+    price: 8,
     categoryId: "brownies",
-    customizationGroups: [brownieAddOns],
   },
   {
     id: "brownie-ninho",
     name: "Brownie de Ninho",
     description: "Brownie de chocolate com uma generosa camada de creme de ninho.",
-    price: 9,
+    price: 15,
     categoryId: "brownies",
     imageSrc: ninhoImage,
     customizationGroups: [brownieAddOns],
@@ -116,16 +125,16 @@ export const products: readonly Product[] = [
     id: "brownie-casadinho",
     name: "Brownie Casadinho",
     description: "A combinação perfeita de brigadeiro e ninho sobre o brownie.",
-    price: 10,
+    price: 15,
     categoryId: "brownies",
     imageSrc: casadinhoImage,
     customizationGroups: [brownieAddOns],
   },
   {
-    id: "brigadeiro-caixinha",
-    name: "Caixinha com 4 Brigadeiros",
-    description: "Monte sua caixinha com até quatro sabores diferentes.",
-    price: 9,
+    id: "quarteto-brigadeiro",
+    name: "Quarteto Brigadeiro",
+    description: "Quatro brigadeiros nos sabores que você escolher.",
+    price: 12,
     categoryId: "brigadeiros",
     customizationGroups: [brigadeiroBoxFlavors],
   },
@@ -133,11 +142,8 @@ export const products: readonly Product[] = [
     id: "brigadeiro-festa",
     name: "Cento de Brigadeiros para Festa",
     description: "100 brigadeiros para adoçar a sua comemoração, do seu jeito.",
-    price: 170,
+    price: 180,
     categoryId: "brigadeiros",
     customizationGroups: [brigadeiroPartyFlavors],
   },
 ];
-import brigadeiroImage from "../assets/brigadeiro.jpeg";
-import casadinhoImage from "../assets/casadinho.jpeg";
-import ninhoImage from "../assets/ninho.jpeg";

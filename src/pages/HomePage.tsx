@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrandHeader } from "../components/brand/BrandHeader";
 import { SiteFooter } from "../components/layout/SiteFooter";
 import { LinkList } from "../components/navigation/LinkList";
@@ -6,6 +7,10 @@ import logo from "../assets/logo-mj.jpeg";
 import { siteConfig } from "../config/site";
 
 export function HomePage() {
+  useEffect(() => {
+    document.title = `${siteConfig.name} | ${siteConfig.tagline}`;
+  }, []);
+
   return (
     <main className="relative isolate grid min-h-dvh grid-rows-[1fr_auto] overflow-hidden bg-brand-canvas px-4 py-8 text-brand-navy sm:px-6 sm:py-12 lg:px-8">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-page-glow" />
