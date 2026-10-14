@@ -305,15 +305,17 @@ As regras comerciais abaixo devem ser respeitadas em todas as alterações.
 Preços definidos:
 
 - Brownie simples: R$ 8,00.
-- Brownie recheado: R$ 15,00.
+- Brownies recheados (Brigadeiro, Ninho e Casadinho): R$ 15,00.
 
-As opções de complemento podem incluir:
+Os brownies recheados oferecem a escolha de um único complemento:
 
 - Morango;
 - KitKat;
-- Nenhum complemento.
+- Nenhum complemento (opção pré-selecionada).
 
 Essas opções não alteram o preço, conforme a regra comercial definida.
+
+O brownie simples não possui opção de complemento.
 
 Não altere preços, classificações ou composição dos produtos sem autorização.
 
@@ -334,15 +336,23 @@ Se houver necessidade de corrigir ou implementar a seleção:
 - Apresente um resumo das escolhas quando aplicável;
 - Não invente sabores, quantidades ou preços.
 
-O preço e a quantidade exata de brigadeiros devem ser obtidos das informações confirmadas pelo proprietário ou do cadastro existente, se confiável.
+Regras confirmadas pelo proprietário:
 
-Se esses dados estiverem ausentes, solicite esclarecimento antes de definir regras comerciais.
+- Preço: R$ 12,00;
+- Quantidade: 4 brigadeiros;
+- O cliente pode repetir ou misturar os sabores;
+- Sabores disponíveis: Brigadeiro, Ninho, Casadinho e Beijinho.
+
+Se algum desses dados mudar ou estiver ausente, solicite esclarecimento antes de definir regras comerciais.
 
 ### 8.3. Brigadeiros
 
-A seção de brigadeiros deve ser apresentada como um único card com possibilidade de escolha de sabores.
+A categoria de brigadeiros possui dois produtos, cada um apresentado como um único card com escolha de sabores:
 
-Não divida os sabores em cards independentes se isso contrariar o comportamento comercial definido.
+- Quarteto Brigadeiro: R$ 12,00, com 4 brigadeiros (ver 8.2);
+- Cento de Brigadeiros: R$ 180,00, com 100 brigadeiros divididos entre os mesmos sabores do Quarteto.
+
+Não divida os sabores em cards independentes.
 
 Preserve o fluxo existente quando estiver correto.
 
@@ -406,13 +416,14 @@ Preserve a navegação e os padrões de apresentação existentes quando estiver
 
 ### Informações institucionais
 
-Verifique, quando aplicável:
+Dados confirmados pelo proprietário:
 
-- Endereço;
-- Horário;
-- Formas de pagamento;
-- Contato;
-- Redes sociais.
+- Horário: segunda a sábado, das 15h às 17h;
+- Formas de pagamento: apenas Pix, por enquanto;
+- WhatsApp: (69) 99250-4096;
+- Instagram: @doceriam.j.
+
+O endereço não deve ser exibido no site. Para retirada, o endereço é enviado ao cliente pelo WhatsApp.
 
 Não publique informações fictícias para preencher campos pendentes.
 
