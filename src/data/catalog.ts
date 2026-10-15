@@ -1,5 +1,6 @@
 import brigadeiroImage from "../assets/brigadeiro.jpeg";
 import casadinhoImage from "../assets/casadinho.jpeg";
+import centoBrigadeirosImage from "../assets/cento-de-brigadeiros.jpeg";
 import ninhoImage from "../assets/ninho.jpeg";
 
 export type ProductCategoryId = "brownies" | "brigadeiros";
@@ -148,6 +149,7 @@ export const products: readonly Product[] = [
     description: "100 brigadeiros para adoçar a sua comemoração, do seu jeito.",
     price: 180,
     categoryId: "brigadeiros",
+    imageSrc: centoBrigadeirosImage,
     customizationGroups: [brigadeiroPartyFlavors],
   },
 ];

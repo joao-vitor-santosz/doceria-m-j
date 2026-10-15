@@ -4,9 +4,9 @@
 
 A **Doceria M&J** é uma marca de doces artesanais criada por um casal, com o propósito de oferecer produtos de qualidade, uma apresentação cuidadosa e uma experiência de compra simples, acolhedora e confiável.
 
-O projeto consiste em uma vitrine digital com página inicial, cardápio organizado por categorias, detalhes dos produtos e informações institucionais.
+O projeto consiste em uma vitrine digital com página inicial, cardápio organizado por categorias, detalhes dos produtos, informações institucionais, carrinho e finalização de pedidos pelo WhatsApp.
 
-O site já está praticamente concluído. Portanto, o objetivo atual não é desenvolver um novo site, reconstruir a aplicação ou implementar todo o PRD do zero.
+O site já está praticamente concluído. Portanto, o objetivo atual não é desenvolver um novo site nem reconstruir a aplicação.
 
 O objetivo é manter, compreender, revisar e aperfeiçoar o projeto existente conforme as necessidades identificadas e as solicitações do proprietário.
 
@@ -29,7 +29,7 @@ O objetivo é manter, compreender, revisar e aperfeiçoar o projeto existente co
 
 Antes de qualquer alteração, compreenda como a aplicação funciona atualmente.
 
-Não trate o PRD como uma ordem para reconstruir o site. Utilize-o como referência para compreender os objetivos, as funcionalidades esperadas e as regras comerciais.
+As regras comerciais e as funcionalidades esperadas estão descritas neste documento (seções 8 e 9). Elas servem de referência, não de ordem para reconstruir o site.
 
 ### Regras obrigatórias
 
@@ -41,7 +41,7 @@ Não trate o PRD como uma ordem para reconstruir o site. Utilize-o como referên
 6. Não instale dependências sem necessidade concreta.
 7. Não altere versões de bibliotecas, configurações ou ferramentas sem uma justificativa técnica.
 8. Não remova funcionalidades, estilos ou componentes existentes sem autorização ou necessidade diretamente relacionada à tarefa.
-9. Não implemente funcionalidades previstas para o futuro apenas porque aparecem no PRD.
+9. Não implemente funcionalidades previstas para o futuro sem solicitação específica.
 10. Não invente informações comerciais para preencher lacunas.
 
 A prioridade é realizar mudanças pequenas, seguras, justificadas e compatíveis com o estado atual do projeto.
@@ -76,7 +76,7 @@ Não leia indiscriminadamente todos os arquivos se isso não for necessário. Co
 Se o proprietário solicitar apenas uma análise inicial:
 
 1. Examine o projeto existente.
-2. Compare seu estado atual com o PRD e este documento.
+2. Compare seu estado atual com este documento.
 3. Identifique problemas reais e possíveis inconsistências.
 4. Diferencie defeitos de sugestões opcionais.
 5. Apresente um diagnóstico objetivo.
@@ -176,12 +176,10 @@ Para decisões pequenas e reversíveis dentro do escopo autorizado, adote a solu
 ### O que não fazer sem solicitação
 
 - Criar novas páginas;
-- Adicionar um carrinho de compras;
-- Implementar checkout;
 - Criar um painel administrativo;
 - Adicionar backend ou banco de dados;
 - Implementar autenticação;
-- Integrar serviços externos;
+- Integrar serviços externos além dos já utilizados (WhatsApp e ViaCEP);
 - Adicionar novas animações por preferência pessoal;
 - Refazer a identidade visual;
 - Migrar bibliotecas ou tecnologias;
@@ -372,7 +370,7 @@ Se identificar inconsistências entre o cardápio e os detalhes de um produto, c
 
 ## 9. Funcionalidades existentes
 
-O PRD é uma referência para verificar o comportamento do produto, não uma autorização para implementar automaticamente todos os requisitos.
+Esta seção descreve o comportamento esperado do produto. Ela não é uma autorização para implementar automaticamente novos requisitos.
 
 ### Página inicial
 
@@ -427,9 +425,35 @@ O endereço não deve ser exibido no site. Para retirada, o endereço é enviado
 
 Não publique informações fictícias para preencher campos pendentes.
 
+### Carrinho e finalização do pedido
+
+Já implementados (rotas `/carrinho` e `/carrinho/finalizar`), sem backend:
+
+- O botão "Adicionar" do detalhe do produto envia o item ao carrinho, com quantidade, sabores, complemento e observação;
+- Itens com o mesmo produto, escolhas e observação são somados em uma única linha;
+- O carrinho fica salvo no navegador (`localStorage`). Apenas os itens são salvos; nome, telefone e endereço nunca são armazenados;
+- Ao carregar o carrinho, preços e escolhas são recalculados e validados a partir de `src/data/catalog.ts`; itens inválidos são descartados;
+- Na finalização, o cliente informa nome e telefone e escolhe **Retirada** ou **Delivery**. No delivery, informa o endereço completo, com preenchimento automático pelo CEP (ViaCEP);
+- O pedido é enviado como mensagem pronta para o WhatsApp da doceria, com itens, escolhas, observações, subtotal, forma de recebimento e dados do cliente;
+- O site não confirma o envio da mensagem; o carrinho só é esvaziado quando o cliente indica que já enviou.
+
+Regras comerciais do pedido:
+
+- Taxa de entrega: combinada pelo WhatsApp (não calculada no site);
+- Pedido mínimo: não há;
+- Pagamento: Pix; a chave é enviada pela doceria depois, não na mensagem.
+
+Mantenha o fluxo existente; não crie um segundo carrinho ou fluxo de compra paralelo.
+
+### Fotografias pendentes
+
+Brownie Simples e Quarteto Brigadeiro ainda não possuem foto e usam o placeholder existente. Use apenas fotos reais fornecidas pelo proprietário.
+
 ### Funcionalidades futuras
 
-WhatsApp integrado, promoções, carrinho, checkout, gestão de catálogo e CRM fazem parte das possibilidades de evolução do projeto.
+Backend (login, registro de pedidos), promoções, cálculo de taxa de entrega, gestão de catálogo e CRM fazem parte das possibilidades de evolução do projeto.
+
+Quando o backend for implementado, integre o login e os pedidos ao carrinho e à finalização existentes, em vez de reconstruí-los.
 
 Não os implemente sem solicitação específica.
 
