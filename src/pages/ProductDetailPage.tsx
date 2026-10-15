@@ -6,9 +6,12 @@ import { MenuBottomNav } from "../components/menu/MenuBottomNav";
 import { ProductCustomizations } from "../components/menu/ProductCustomizations";
 import { ProductImage } from "../components/menu/ProductImage";
 import { siteConfig } from "../config/site";
+import { useCart } from "../context/cart-context";
 import { productCategories, type ProductOption, type ProductOptionGroup } from "../data/catalog";
 import { formatPrice } from "../utils/currency";
 import {
+  findInvalidGroup,
+  getCustomizationExtraPrice,
   getDefaultOptionQuantities,
   getGroupSelectedQuantity,
   getOptionSelectionKey,
@@ -16,6 +19,7 @@ import {
 
 export function ProductDetailPage() {
   const navigate = useNavigate();
+  const { addItem } = useCart();
   const product = useLoaderData({ from: "/menu/produtos/$productId" });
   const customizationGroups = product.customizationGroups ?? [];
   const category = productCategories.find((item) => item.id === product.categoryId);
@@ -31,28 +35,9 @@ export function ProductDetailPage() {
     document.title = `${product.name} | ${siteConfig.name}`;
   }, [product.name]);
 
-  const selectedOptions = customizationGroups.flatMap((group) =>
-    group.options
-      .filter((option) => (selectedOptionQuantities[getOptionSelectionKey(group.id, option.id)] ?? 0) > 0)
-      .map((option) => ({
-        ...option,
-        quantity: selectedOptionQuantities[getOptionSelectionKey(group.id, option.id)] ?? 0,
-      })),
-  );
-  const extraPrice = selectedOptions.reduce((sum, option) => sum + option.price * option.quantity, 0);
+  const extraPrice = getCustomizationExtraPrice(customizationGroups, selectedOptionQuantities);
   const total = (product.price + extraPrice) * quantity;
-  const invalidGroup = customizationGroups.find((group) => {
-    const selectedQuantity = getGroupSelectedQuantity(group, selectedOptionQuantities);
-
-    if (group.selectionMode === "quantity") {
-      return (
-        selectedQuantity < (group.minimumQuantity ?? 0) ||
-        selectedQuantity > (group.maximumQuantity ?? Number.MAX_SAFE_INTEGER)
-      );
-    }
-
-    return group.required && selectedQuantity === 0;
-  });
+  const invalidGroup = findInvalidGroup(customizationGroups, selectedOptionQuantities);
 
   function handleAdd() {
     if (invalidGroup) {
@@ -61,6 +46,12 @@ export function ProductDetailPage() {
       return;
     }
 
+    addItem({
+      productId: product.id,
+      quantity,
+      optionQuantities: selectedOptionQuantities,
+      note,
+    });
     setWasAdded(true);
   }
 
@@ -199,11 +190,20 @@ export function ProductDetailPage() {
               : `Escolha uma opção em "${invalidGroup.title}" para continuar.`}
           </p>
         )}
-        {wasAdded && (
-          <p className="mt-4 rounded-2xl bg-brand-navy px-4 py-3 text-center text-sm font-semibold text-brand-cream" role="status">
-            O carrinho ainda não está disponível. Em breve você poderá finalizar seu pedido por aqui.
-          </p>
-        )}
+        <div role="status">
+          {wasAdded && (
+            <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl bg-brand-navy px-4 py-4 text-center text-sm font-semibold text-brand-cream sm:flex-row sm:justify-between sm:text-left">
+              <p>Produto adicionado ao carrinho!</p>
+              <button
+                className="rounded-xl bg-brand-gold px-4 py-2.5 text-sm font-extrabold text-brand-navy transition hover:bg-[#e8c17c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                type="button"
+                onClick={() => navigate({ to: "/carrinho" })}
+              >
+                Ver carrinho
+              </button>
+            </div>
+          )}
+        </div>
       </section>
       <MenuBottomNav activePage="menu" />
     </main>

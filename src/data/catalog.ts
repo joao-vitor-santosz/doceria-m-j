@@ -20,6 +20,7 @@ export type ProductOption = {
 export type ProductOptionGroup = {
   id: string;
   title: string;
+  summaryTitle?: string;
   description?: string;
   required?: boolean;
   selectionMode: "single" | "multiple" | "quantity";
@@ -43,12 +44,13 @@ export type Product = {
 const brownieAddOns: ProductOptionGroup = {
   id: "brownie-add-ons",
   title: "Complemento",
+  summaryTitle: "Complemento",
   description: "Escolha um complemento, sem alteração no valor.",
   required: true,
   selectionMode: "single",
   defaultOptionId: "none",
   options: [
-    { id: "none", label: "Sem complemento", price: 0 },
+    { id: "none", label: "Nenhum", price: 0 },
     { id: "strawberry", label: "Morango", price: 0 },
     { id: "kit-kat", label: "KitKat", price: 0 },
   ],
@@ -64,6 +66,7 @@ const brigadeiroFlavorOptions: readonly ProductOption[] = [
 const brigadeiroBoxFlavors: ProductOptionGroup = {
   id: "brigadeiro-box-flavors",
   title: "Monte seu quarteto",
+  summaryTitle: "Sabores",
   description: "Escolha 4 brigadeiros. Você pode repetir ou misturar os sabores.",
   selectionMode: "quantity",
   minimumQuantity: 4,
@@ -74,6 +77,7 @@ const brigadeiroBoxFlavors: ProductOptionGroup = {
 const brigadeiroPartyFlavors: ProductOptionGroup = {
   id: "brigadeiro-party-flavors",
   title: "Monte o seu cento",
+  summaryTitle: "Sabores",
   description: "Divida 100 brigadeiros entre os sabores que preferir.",
   selectionMode: "quantity",
   minimumQuantity: 100,

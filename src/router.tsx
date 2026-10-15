@@ -6,6 +6,8 @@ import {
   redirect,
 } from "@tanstack/react-router";
 import { products } from "./data/catalog";
+import { CartPage } from "./pages/CartPage";
+import { CheckoutPage } from "./pages/CheckoutPage";
 import { HomePage } from "./pages/HomePage";
 import { InformationPage } from "./pages/InformationPage";
 import { MenuPage } from "./pages/MenuPage";
@@ -55,12 +57,26 @@ const productRoute = createRoute({
   component: ProductDetailPage,
 });
 
+const cartRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/carrinho",
+  component: CartPage,
+});
+
+const checkoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/carrinho/finalizar",
+  component: CheckoutPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   menuRoute,
   informationRoute,
   signInRoute,
   productRoute,
+  cartRoute,
+  checkoutRoute,
 ]);
 
 export const router = createRouter({ routeTree });

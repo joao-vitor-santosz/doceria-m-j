@@ -1,14 +1,16 @@
-import { BookOpen, LogIn, Search } from "lucide-react";
+import { BookOpen, LogIn, Search, ShoppingBag } from "lucide-react";
 import type { ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useCart } from "../../context/cart-context";
 
 type MenuBottomNavProps = {
-  activePage: "menu" | "information" | "sign-in";
+  activePage: "menu" | "cart" | "information" | "sign-in";
   onSearch?: () => void;
 };
 
 export function MenuBottomNav({ activePage, onSearch }: MenuBottomNavProps) {
   const navigate = useNavigate();
+  const { totalQuantity } = useCart();
   const isMenuActive = activePage === "menu";
 
   return (
@@ -16,7 +18,7 @@ export function MenuBottomNav({ activePage, onSearch }: MenuBottomNavProps) {
       className="fixed inset-x-0 bottom-0 z-20 border-t border-brand-gold/25 bg-brand-canvas/95 px-4 py-2.5 backdrop-blur"
       aria-label="Navegação do cardápio"
     >
-      <div className="mx-auto grid w-full max-w-md grid-cols-3">
+      <div className="mx-auto grid w-full max-w-md grid-cols-4">
         <NavButton
           active={isMenuActive}
           icon={<BookOpen size={19} aria-hidden="true" />}
@@ -37,6 +39,13 @@ export function MenuBottomNav({ activePage, onSearch }: MenuBottomNavProps) {
           }}
         />
         <NavButton
+          active={activePage === "cart"}
+          icon={<ShoppingBag size={19} aria-hidden="true" />}
+          label="Carrinho"
+          badge={totalQuantity}
+          onClick={() => navigate({ to: "/carrinho" })}
+        />
+        <NavButton
           active={activePage === "sign-in"}
           icon={<LogIn size={19} aria-hidden="true" />}
           label="Entrar"
@@ -51,10 +60,11 @@ type NavButtonProps = {
   active: boolean;
   icon: ReactNode;
   label: string;
+  badge?: number;
   onClick: () => void;
 };
 
-function NavButton({ active, icon, label, onClick }: NavButtonProps) {
+function NavButton({ active, icon, label, badge = 0, onClick }: NavButtonProps) {
   return (
     <button
       className={`flex flex-col items-center gap-1 rounded-xl py-1 text-xs font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold ${
@@ -64,8 +74,19 @@ function NavButton({ active, icon, label, onClick }: NavButtonProps) {
       aria-current={active ? "page" : undefined}
       onClick={onClick}
     >
-      {icon}
+      <span className="relative">
+        {icon}
+        {badge > 0 && (
+          <span
+            className="absolute -right-2.5 -top-1.5 grid h-4.5 min-w-4.5 place-items-center rounded-full bg-brand-gold px-1 text-[0.65rem] font-extrabold leading-none text-brand-navy"
+            aria-hidden="true"
+          >
+            {badge > 99 ? "99+" : badge}
+          </span>
+        )}
+      </span>
       {label}
+      {badge > 0 && <span className="sr-only">({badge} {badge === 1 ? "item" : "itens"})</span>}
     </button>
   );
 }
