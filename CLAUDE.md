@@ -416,7 +416,7 @@ Preserve a navegação e os padrões de apresentação existentes quando estiver
 
 Dados confirmados pelo proprietário:
 
-- Horário: segunda a sábado, das 15h às 17h;
+- Horário: segunda a sábado, das 15h às 18h30;
 - Formas de pagamento: apenas Pix, por enquanto;
 - WhatsApp: (69) 99250-4096;
 - Instagram: @doceriam.j.
