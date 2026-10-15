@@ -12,7 +12,7 @@ export type SocialLink = {
   icon: LucideIcon | IconType;
 };
 
-const whatsappNumber = "5569992504096";
+const whatsappNumber = "5569992644083";
 const whatsappUrl = `https://wa.me/${whatsappNumber}`;
 
 export const siteConfig = {
