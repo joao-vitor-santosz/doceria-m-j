@@ -1,8 +1,13 @@
 # PRD — Doceria M&J: Backend
 
-**Versão:** 1.2
-**Data:** 15/10/2026
+**Versão:** 1.3
+**Data:** 26/11/2026
 **Status:** escopo, tecnologias, hospedagem e autenticação definidos pelo proprietário. Restam as decisões da seção 11.3.
+
+**Histórico:**
+
+- 1.3 (26/11/2026): revisão a partir de uma nova análise completa do site. Fluxo de esvaziamento do carrinho alinhado ao comportamento atual (seção 7), regras de validação do servidor detalhadas (5.3), proteção contra pedido duplicado, fuso horário (10.3.1), conversão de preços para centavos (9), mensagem de retirada (13.3), limites dos campos (13.4) e novas decisões pendentes (11.3, itens 9 e 10).
+- 1.2 (15/10/2026): versão inicial publicada no repositório.
 
 **Repositórios:**
 
@@ -125,6 +130,11 @@ Os identificadores e a estrutura completa do cardápio estão na seção 13.1.
 
 - **O preço é sempre calculado pelo servidor**, a partir do cardápio armazenado no banco. Preços enviados pelo navegador são ignorados.
 - O servidor valida as escolhas de cada item (ex.: o Quarteto precisa ter exatamente 4 brigadeiros; o Brownie Simples não aceita complemento; opções inexistentes são recusadas).
+- Chaves de opção que não pertencem ao produto (ex.: `brownie-add-ons:none` enviada no Quarteto) são **recusadas** com erro, e não descartadas em silêncio. O site atual as descarta ao carregar o carrinho, mas o servidor deve ser estrito.
+- Quantidades (do item e de cada opção) devem ser inteiros positivos. Zero, negativos, decimais e textos são recusados.
+- Em grupos `single`, no máximo uma opção, com quantidade 1. Em grupos `single` obrigatórios sem escolha, o servidor pode aplicar a opção padrão (`defaultOptionId`), como o site faz ao abrir o produto, ou recusar; a implementação deve documentar o comportamento escolhido.
+- O pedido não pode ter a lista de itens vazia.
+- **Pedido duplicado:** um toque duplo ou uma nova tentativa após falha de rede não pode gerar dois pedidos. `POST /orders` deve aceitar uma chave de idempotência gerada pelo site (ex.: cabeçalho `Idempotency-Key`) e devolver o mesmo pedido quando a chave se repetir.
 - Produtos e opções indisponíveis não podem ser pedidos.
 - O pedido guarda uma **cópia** do nome, do preço e das escolhas de cada item no momento da compra, para que mudanças futuras no cardápio não alterem pedidos antigos.
 
@@ -203,7 +213,7 @@ Para validar e calcular preços, o servidor precisa conhecer o cardápio. Na Fas
 4. O cliente escolhe retirada ou delivery e confirma.
 5. O site envia à API os itens (produto, quantidade, escolhas, observação), a forma de recebimento, o endereço (salvo ou novo) e o celular.
 6. O servidor valida tudo, recalcula os preços, registra o pedido com status **Recebido** e devolve o número, os itens e o total.
-7. O site abre o WhatsApp com a mensagem pronta (seção 13.3), incluindo o número do pedido, e esvazia o carrinho.
+7. O site abre o WhatsApp com a mensagem pronta (seção 13.3), incluindo o número do pedido. Como hoje, o site não confirma o envio da mensagem: mostra a tela de pedido enviado, permite reabrir o WhatsApp e só esvazia o carrinho quando o cliente indica que já enviou. Reabrir o WhatsApp **não** cria um novo pedido.
 8. A doceria confirma pelo WhatsApp, combina a taxa de entrega, envia a chave Pix e atualiza o status no painel.
 
 **Falhas:**
@@ -244,6 +254,8 @@ Os nomes são ilustrativos; a modelagem final será feita no schema do Prisma.
 
 Valores monetários devem ser armazenados em **centavos (inteiro)** ou como `Decimal`, nunca como ponto flutuante.
 
+O site representa preços em **reais** (`15` = R$ 15,00). Se o backend usar centavos, a unidade deve ficar explícita no contrato da API (ex.: campos `priceCents`), para evitar erros de escala de 100 vezes.
+
 ---
 
 ## 10. Requisitos não funcionais
@@ -274,6 +286,12 @@ O backend passará a armazenar dados pessoais (nome, e-mail, celular, endereço)
 
 - Volume esperado baixo (doceria artesanal local). A solução deve priorizar **custo baixo e manutenção simples**, preferencialmente dentro dos planos gratuitos da Vercel e do Supabase.
 - Respostas da API em menos de 1 segundo em condições normais.
+- Funções serverless sem uso recente podem demorar mais na primeira chamada; o site deve exibir estado de carregamento no login e no envio do pedido.
+
+### 10.3.1. Datas e fuso horário
+
+- Datas armazenadas em UTC (`timestamptz`).
+- Exibição e regras de horário de funcionamento no fuso da doceria: **America/Porto_Velho** (UTC−4, sem horário de verão).
 
 ### 10.4. Disponibilidade
 
@@ -323,6 +341,8 @@ O backend passará a armazenar dados pessoais (nome, e-mail, celular, endereço)
 | 6 | **Confirmação do e-mail no cadastro** | Exigir confirmação por link (depende do serviço de e-mail) ou não exigir na Fase 1 |
 | 7 | **Carrinho** | Manter só no navegador ou também salvar na conta do cliente |
 | 8 | **Fase 2 junto com a Fase 1** | Fazer a gestão do cardápio agora ou depois |
+| 9 | **Pedidos fora do horário** | Hoje o site aceita pedidos a qualquer hora; o horário (segunda a sábado, 15h às 18h30) é apenas informativo. Manter assim, avisar o cliente ou bloquear fora do horário. Também falta definir se haverá pedido com data agendada (relevante para o Cento de Brigadeiros) |
+| 10 | **Limite de quantidade por item** | O site não define quantidade máxima por item. Definir se o servidor impõe um limite (e qual) ou aceita qualquer quantidade, deixando a doceria tratar pelo WhatsApp |
 
 ---
 
@@ -455,7 +475,11 @@ Exemplo de um Quarteto com 2 Ninho e 2 Beijinho:
 }
 ```
 
+O site também guarda um `id` local em cada item (combinação de produto, escolhas e observação, usada para somar itens iguais). Ele é interno do navegador e **não** deve ser enviado nem usado pelo servidor. O carrinho fica no `localStorage` sob a chave `doceria-mj:cart`.
+
 Dados de endereço usados hoje na finalização: `cep`, `street`, `number`, `complement`, `neighborhood`, `city`, `reference`. Forma de recebimento: `pickup` ou `delivery`.
+
+O campo `city` é preenchido pelo ViaCEP no formato **"Cidade - UF"** (ex.: `Porto Velho - RO`), em um único campo. O backend pode manter esse formato ou separar cidade e UF; se separar, o site precisa ser ajustado.
 
 ### 13.3. Mensagem do WhatsApp
 
@@ -486,6 +510,29 @@ CEP: 76801-059
 Referência: Perto da praça
 ```
 
+Na retirada, a linha de entrega é `*Entrega:* Retirada (aguardo o endereço para retirada)` e o bloco de endereço não aparece.
+
+### 13.4. Limites dos campos no site
+
+O servidor deve aplicar, no mínimo, as mesmas regras que o site já aplica:
+
+| Campo | Regra no site |
+|---|---|
+| Nome | Obrigatório; 2 a 80 caracteres (sem os espaços das pontas) |
+| Telefone | Obrigatório; 10 ou 11 dígitos com DDD. O site formata como `(69) 99999-9999`; o servidor deve guardar apenas os dígitos |
+| Forma de recebimento | Obrigatória: `pickup` ou `delivery` |
+| CEP | Obrigatório no delivery; 8 dígitos |
+| Rua | Obrigatória no delivery; até 120 caracteres |
+| Número | Obrigatório no delivery; até 20 caracteres |
+| Complemento | Opcional; até 60 caracteres |
+| Bairro | Obrigatório no delivery; até 80 caracteres |
+| Cidade | Obrigatória no delivery; até 80 caracteres |
+| Referência | Opcional; até 120 caracteres |
+| Observação do item | Opcional; até 180 caracteres |
+| Quantidade do item | Inteiro, mínimo 1 |
+
+Na retirada, um endereço enviado deve ser ignorado (não armazenado no pedido).
+
 ---
 
 ## 14. Critérios de aceite da Fase 1
@@ -498,6 +545,7 @@ Referência: Perto da praça
 - A mensagem do WhatsApp contém o número do pedido.
 - O total registrado é calculado pelo servidor e confere com o cardápio.
 - Um pedido com escolhas inválidas, produto inexistente ou preço adulterado é recusado.
+- Enviar o mesmo pedido duas vezes (mesma chave de idempotência) não cria um pedido duplicado.
 - O cliente vê seus pedidos e o status atualizado.
 - O cliente não consegue ver pedidos ou dados de outros clientes.
 - A doceria consegue alterar o status de um pedido e registrar a taxa de entrega.
